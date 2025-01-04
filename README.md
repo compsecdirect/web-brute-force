@@ -1,4 +1,4 @@
-# Apache Brute
+# Web Brute Force
 
 #### Version 0.8
 
