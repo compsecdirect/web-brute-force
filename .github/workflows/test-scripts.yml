@@ -1,0 +1,51 @@
+
+name: Test and Validate Scripts
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-scripts:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y geoip-bin awscli mailutils
+
+    - name: Copy test data
+      run: |
+        cp -r test-data/* ./
+
+    - name: Validate Apache Script with Test Data
+      run: |
+        cd apache
+        bash apache-brutev8-lb.sh --test ../test-data/access_log
+
+    - name: Validate AWS IPv4 Script
+      run: |
+        cd aws
+        bash block-ip-aws.sh 192.168.1.1
+
+    - name: Validate AWS IPv6 Script
+      run: |
+        cd aws
+        bash block-ip-v6-aws.sh ::1
+
+    - name: Deploy AWS Web ACL
+      run: |
+        cd aws
+        bash deploy-aws-web-acl.sh
+
+    - name: Performance Metrics
+      run: |
+        echo "Performance metrics to be implemented in future iterations."
